@@ -1,0 +1,16 @@
+[project]
+name = "project-setup"
+version = "0.1.1"
+description = "Scaffold a new Python project with uv, prek, and a data science stack."
+readme = "README.md"
+authors = [
+    { name = "Kristijan Armeni", email = "kristijan.armeni@gmail.com" }
+]
+requires-python = ">=3.12"
+
+[project.scripts]
+project-setup = "project_setup:main"
+
+[build-system]
+requires = ["uv_build>=0.10.7,<0.11.0"]
+build-backend = "uv_build"

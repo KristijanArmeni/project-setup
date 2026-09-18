@@ -25,10 +25,10 @@ def get_git_config(key: str) -> str | None:
 
 def init_project(name: str | None) -> Path:
     if name:
-        subprocess.run(["uv", "init", name], check=True)
+        subprocess.run(["uv", "init", "--package", name], check=True)
         return Path(name)
     else:
-        subprocess.run(["uv", "init"], check=True)
+        subprocess.run(["uv", "init", "--package"], check=True)
         return Path.cwd()
 
 

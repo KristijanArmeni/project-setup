@@ -12,6 +12,12 @@ DIRS = ["scripts", "data", "out", "tmp", "notebooks", "doc", "tests"]
 DEPS = ["matplotlib", "numpy", "polars", "dotenv", "pytest"]
 
 
+def _run(cmd: list[str], cwd: Path | None = None) -> None:
+    cwd_str = f" (cwd: {cwd})" if cwd else ""
+    print(f"  $ {' '.join(cmd)}{cwd_str}")
+    subprocess.run(cmd, cwd=cwd, check=True)
+
+
 def get_git_config(key: str) -> str | None:
     try:
         result = subprocess.run(
@@ -25,10 +31,10 @@ def get_git_config(key: str) -> str | None:
 
 def init_project(name: str | None) -> Path:
     if name:
-        subprocess.run(["uv", "init", "--package", name], check=True)
+        _run(["uv", "init", "--package", name])
         return Path(name)
     else:
-        subprocess.run(["uv", "init", "--package"], check=True)
+        _run(["uv", "init", "--package"])
         return Path.cwd()
 
 
@@ -46,10 +52,7 @@ def create_dirs(project_dir: Path) -> None:
 
 
 def add_deps(project_dir: Path) -> None:
-    subprocess.run(
-        ["uv", "add"] + DEPS,
-        cwd=project_dir, check=True,
-    )
+    _run(["uv", "add"] + DEPS, cwd=project_dir)
 
 
 def set_author(project_dir: Path) -> None:
@@ -79,7 +82,39 @@ def set_author(project_dir: Path) -> None:
 
 
 def install_hooks(project_dir: Path) -> None:
-    subprocess.run(["prek", "install"], cwd=project_dir, check=True)
+    _run(["prek", "install"], cwd=project_dir)
+
+
+def _build_preview(args: argparse.Namespace) -> list[tuple[str, list[str]]]:
+    project_name = args.name
+    actions: list[tuple[str, list[str]]] = []
+
+    init_cmd = ["uv", "init", "--package"]
+    if project_name:
+        init_cmd.append(project_name)
+    actions.append(("Init project", [f"$ {' '.join(init_cmd)}"]))
+
+    actions.append(("Copy templates", [f"  - {t}" for t in TEMPLATES]))
+
+    actions.append(("Create directories", [f"  - {d}" for d in DIRS]))
+
+    deps_cmd = ["uv", "add"] + DEPS
+    actions.append(("Add dependencies", [f"$ {' '.join(deps_cmd)}"]))
+
+    author_name = get_git_config("name")
+    author_email = get_git_config("email")
+    if author_name or author_email:
+        parts = []
+        if author_name:
+            parts.append(f'name = "{author_name}"')
+        if author_email:
+            parts.append(f'email = "{author_email}"')
+        actions.append(("Set author (modify pyproject.toml)", [f"  - authors = [{{ {', '.join(parts)} }}]"]))
+
+    prek_cmd = ["prek", "install"]
+    actions.append(("Install hooks", [f"$ {' '.join(prek_cmd)}"]))
+
+    return actions
 
 
 def main() -> None:
@@ -88,6 +123,21 @@ def main() -> None:
     )
     parser.add_argument("name", nargs="?", default=None, help="Project name (defaults to current directory)")
     args = parser.parse_args()
+
+    actions = _build_preview(args)
+
+    print("The following actions will be performed:")
+    print()
+    for desc, items in actions:
+        print(f"  {desc}:")
+        for item in items:
+            print(f"    {item}")
+    print()
+
+    confirm = input("Proceed? (y/n): ")
+    if confirm.lower() != "y":
+        print("Aborted.")
+        sys.exit(0)
 
     project_dir = init_project(args.name)
     copy_templates(project_dir)

@@ -1,6 +1,6 @@
 [project]
 name = "project-setup"
-version = "0.1.1"
+version = "0.0.1"
 description = "Scaffold a new Python project with uv, prek, and a data science stack."
 readme = "README.md"
 authors = [

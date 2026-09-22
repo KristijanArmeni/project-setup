@@ -23,12 +23,6 @@ After running the setup command, your project will have the following structure:
 
 ```
 my-project/
-├── .gitignore
-├── .python-version
-├── prek.toml
-├── pyproject.toml
-├── ruff.toml
-├── uv.lock
 ├── data/
 ├── doc/
 ├── notebooks/
@@ -37,5 +31,20 @@ my-project/
 ├── src/
 │   └── my_project/
 ├── tests/
-└── tmp/
+├── tmp/
+├── .gitignore
+├── .python-version
+├── prek.toml
+├── pyproject.toml
+├── ruff.toml
+└── uv.lock
 ```
+
+### Configuration files
+
+**`prek.toml`** — pre-commit hooks:
+- **ruff-pre-commit** (v0.16.1): `ruff-format` (formatter + import sort) and `ruff --fix` (linter)
+- **pre-commit-hooks** (v6.0.0): `trailing-whitespace`, `end-of-file-fixer`, `check-yaml`, `check-toml`
+
+**`ruff.toml`** — linter config:
+- Suppresses `B018` (useless expression) in `notebooks/*.py`

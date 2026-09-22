@@ -1,6 +1,6 @@
 # project-setup
 
-Scaffold a new Python project with `uv`, `prek`, and a data science stack.
+Scaffold a new Python project with `uv`, `prek`, and an opinionated data science stack.
 
 ## Usage
 
@@ -16,3 +16,26 @@ This will:
 4. Add default dependencies: `matplotlib`, `numpy`, `polars`, `dotenv`, `pytest`
 5. Set author info from your git config
 6. Install git hooks via `prek install`
+
+## Output
+
+After running the setup command, your project will have the following structure:
+
+```
+my-project/
+├── .gitignore
+├── .python-version
+├── prek.toml
+├── pyproject.toml
+├── ruff.toml
+├── uv.lock
+├── data/
+├── doc/
+├── notebooks/
+├── out/
+├── scripts/
+├── src/
+│   └── my_project/
+├── tests/
+└── tmp/
+```
